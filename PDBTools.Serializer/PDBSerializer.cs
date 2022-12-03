@@ -48,11 +48,11 @@ namespace PDBTools.Serializer
         /// <param name="endString"></param>
         /// <param name="raw">Enabled: Will return the raw representation without any filtering.</param>
         /// <returns></returns>
-        public static List<string> ExtractData(
-            string text, string startString = "<?", string endString = "?>", bool raw = false)
+        public static List<string> ExtractData(string text)
         {
             var matched = new List<string>();
             var exit = false;
+
             while (!exit)
             {
                 var indexStart = text.IndexOf(startString, StringComparison.Ordinal);
@@ -74,6 +74,16 @@ namespace PDBTools.Serializer
             }
             return matched;
         }
+
+        private static List<string> ExtractCoordinateSection(string text)
+        {
+            var matched = new List<string>();
+
+            text.IndexOf("MODEL", );
+
+            return matched;
+        }
+
         /// <summary>
         /// Returns a list of all the serialized properties.
         /// </summary>
