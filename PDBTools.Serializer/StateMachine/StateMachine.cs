@@ -4,11 +4,20 @@ namespace PDBTools.Serializer.StateMachine
 {
     public class StateMachine
     {
-        public PDBModel PDBModel { get; set; }
+        public PdbDataModel PdbDataModel { get; set; }
+        public List<string> Lines { get; set; }
+        public int LineId = 0;        
+
         public IState CurrentState { get; private set; }
         public IState PreviousState { get; private set; }
 
         private bool inTransition = false;
+
+        #region 'States'
+        public IState CoordinateSectionState { get; set; }
+        public IState SelectSection { get; set; }
+        #endregion
+
 
         public virtual void ChangeState(IState newState)
         {
