@@ -5,7 +5,8 @@ namespace PDBTools.Serializer.StateMachine
     public class StateMachine
     {
         public PdbDataModel PdbDataModel { get; set; }
-        public List<string> Lines { get; set; }
+        public List<string> Lines = new List<string>();
+        public string CurrentLine { get => GetCurrentLine(); }
         public int LineId = 0;        
 
         public IState CurrentState { get; private set; }
@@ -18,6 +19,12 @@ namespace PDBTools.Serializer.StateMachine
         public IState SelectSection { get; set; }
         #endregion
 
+        public StateMachine(List<string> lines){
+            PdbDataModel = new PdbDataModel();
+            PdbDataModel.Models = new List<Model>();
+
+            Lines.AddRange(lines);
+        }
 
         public virtual void ChangeState(IState newState)
         {
@@ -47,6 +54,14 @@ namespace PDBTools.Serializer.StateMachine
             {
                 CurrentState.Execute();
             }
+        }
+
+        private string GetCurrentLine(){
+            if(Lines.Count < LineId + 1){
+                return "MACHINE EXIT";
+            }
+
+            return Lines[LineId];
         }
     }
 }

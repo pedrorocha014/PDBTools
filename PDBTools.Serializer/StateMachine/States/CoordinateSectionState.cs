@@ -1,9 +1,4 @@
 ﻿using PDBTools.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PDBTools.Serializer.StateMachine.States
 {
@@ -27,22 +22,39 @@ namespace PDBTools.Serializer.StateMachine.States
 
         public void Execute()
         {
-            var currentLine = _stateMachine.Lines[_stateMachine.LineId];
             var lineInsideModel = true;
 
             //Things that can be inside a MODEL
+            var atomsList = new List<Atom>();
 
             while (lineInsideModel)
             {
+                var currentLine = _stateMachine.CurrentLine;
 
                 if (currentLine.StartsWith("ATOM"))
                 {
+                    atomsList.Add(new Atom{
+                        Type = currentLine.Substring(76, 2).Trim(),
+                        X = float.Parse(currentLine.Substring(30, 8).Replace('.',',')),
+                        Y = float.Parse(currentLine.Substring(30, 8).Replace('.',',')),
+                        Z = float.Parse(currentLine.Substring(30, 8).Replace('.',','))                            
+                    });
+
+                    _stateMachine.LineId++;
+                    break;
+                }
+
+                if (currentLine.StartsWith("ENDMDL")){
                     _stateMachine.LineId++;
                     break;
                 }
 
                 lineInsideModel = false;
             }
+
+            _currentModel.Atoms = atomsList;
+            _stateMachine.PdbDataModel.Models.Add(_currentModel);
+            _stateMachine.ChangeState(_stateMachine.SelectSection);
         }
     }
 }
