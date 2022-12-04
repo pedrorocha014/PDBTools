@@ -41,7 +41,12 @@ namespace PDBTools.Serializer.StateMachine.States
                     });
 
                     _stateMachine.LineId++;
-                    break;
+                    continue;
+                }
+
+                if(currentLine.StartsWith("TER")){
+                    _stateMachine.LineId++;
+                    continue;
                 }
 
                 if (currentLine.StartsWith("ENDMDL")){
