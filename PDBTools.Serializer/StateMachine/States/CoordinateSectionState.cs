@@ -26,6 +26,9 @@ namespace PDBTools.Serializer.StateMachine.States
 
             //Things that can be inside a MODEL
             var atomsList = new List<Atom>();
+            var anisouList = new List<Anisou>();
+            var hetatmList = new List<Hetatm>();
+            var tersList = new List<Ter>();
 
             while (lineInsideModel)
             {
@@ -33,18 +36,25 @@ namespace PDBTools.Serializer.StateMachine.States
 
                 if (currentLine.StartsWith("ATOM"))
                 {
-                    atomsList.Add(new Atom{
-                        Type = currentLine.Substring(76, 2).Trim(),
-                        X = float.Parse(currentLine.Substring(30, 8).Replace('.',',')),
-                        Y = float.Parse(currentLine.Substring(30, 8).Replace('.',',')),
-                        Z = float.Parse(currentLine.Substring(30, 8).Replace('.',','))                            
-                    });
+                    atomsList.Add(BuildAtom(currentLine));
+                    _stateMachine.LineId++;
+                    continue;
+                }
 
+                if(currentLine.StartsWith("HETATM")){
+                    hetatmList.Add(BuildHetatm(currentLine));
+                    _stateMachine.LineId++;
+                    continue;
+                }
+                
+                if(currentLine.StartsWith("ANISOU")){
+                    anisouList.Add(BuildAnisou(currentLine));
                     _stateMachine.LineId++;
                     continue;
                 }
 
                 if(currentLine.StartsWith("TER")){
+                    tersList.Add(BuildTer(currentLine));
                     _stateMachine.LineId++;
                     continue;
                 }
@@ -57,9 +67,50 @@ namespace PDBTools.Serializer.StateMachine.States
                 lineInsideModel = false;
             }
 
-            _currentModel.Atoms = atomsList;
+            _currentModel.Atom = atomsList;
+            _currentModel.Anisou = anisouList;
+            _currentModel.Hetatm = hetatmList;
+            _currentModel.Ter = tersList;
+
             _stateMachine.PdbDataModel.Models.Add(_currentModel);
             _stateMachine.ChangeState(_stateMachine.SelectSection);
+        }
+    
+        private Atom BuildAtom(string line){
+            return new Atom{
+                Serial = int.Parse(line.Substring(6, 5)),
+                Name = line.Substring(12, 4).Trim(),
+                AltLoc = line.Substring(16, 1).Trim(),
+                ResName = line.Substring(17, 3).Trim(),
+                ChainID = line.Substring(21, 1).Trim(),
+                ResSeq = int.Parse(line.Substring(22, 4)),
+                ICode = line.Substring(26, 1).Trim(),
+                X = float.Parse(line.Substring(30, 8).Replace('.',',')),
+                Y = float.Parse(line.Substring(38, 8).Replace('.',',')),
+                Z = float.Parse(line.Substring(46, 8).Replace('.',',')),
+                Occupancy = line.Substring(54, 6).Trim(),
+                TempFactor = line.Substring(60, 6).Trim(),
+                Element = line.Substring(76, 2).Trim(),
+                Charge = line.Substring(78, 2).Trim()
+            };
+        }
+
+        private Ter BuildTer(string line){
+            return new Ter{
+                Serial = int.Parse(line.Substring(6, 5)),
+                ResName = line.Substring(17, 3).Trim(),
+                ChainId = line.Substring(21, 1).Trim(),
+                ResSeq = int.Parse(line.Substring(22, 4)),
+                ICode = line.Substring(26, 1).Trim()
+            };
+        }
+    
+        private Anisou BuildAnisou(string line){
+            return new Anisou(){};
+        }
+
+        private Hetatm BuildHetatm(string line){
+            return new Hetatm(){};
         }
     }
 }
