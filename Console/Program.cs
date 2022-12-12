@@ -1,7 +1,10 @@
-﻿using PDBTools.Serializer;
+﻿using PDBTools.Data;
+using PDBTools.Serializer;
 
-List<string> lines = File.ReadAllLines("/home/pedro/Downloads/2m6q(1).pdb").ToList();  
+//List<string> lines = File.ReadAllLines("/home/pedro/Downloads/2m6q(1).pdb").ToList();  
 
-var result = PDBSerializer.Serialize(lines);
+//var result = PDBSerializer.Serialize(lines);
 
-Console.WriteLine(result.Models);
+var a = PdbDataDictionary.Model["ID"].Invoke("ABCD");
+
+Console.WriteLine(a);
